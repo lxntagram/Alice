@@ -1,0 +1,42 @@
+{
+    "captcha": {
+        "service": "",
+        "api_key": ""
+    },
+
+    "email_verification": {
+        "captcha": {
+            "solve_captcha": true,
+            "service": "",
+            "api_key": ""
+        },
+
+        "mail_type": "OUTLOOK",
+        "kopechka_key": ""
+    },
+
+    "user":{
+        "humanization": {
+            "pfp": true,
+            "bio": true,
+            "hypesquad": true,
+            "pronouns": true
+        },
+
+        "unique_username": true
+    },
+
+
+    "advanced": {
+        "prints": {
+            "token_creation": true,
+            "errors": true,
+            "captcha": true,
+            "humanized": true,
+            "unlocked": true,
+            "locked": true,
+            "onlined": true,
+            "verified": true
+        }
+    }
+}
