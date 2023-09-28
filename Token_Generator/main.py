@@ -709,8 +709,11 @@ class Generator:
                 if config['email_verification']['captcha']['solve_captcha'] == True:
                     while True:
                         try:
-
-                            verify_topken = SolveCaptchaCapmonster("f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34", "https://discord.com/", ua, proxy)
+                            verify_topken=""
+                             if(config['captcha']['service'] == "capmonster"):
+                                verify_topken = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+                            elif config['captcha']['service'] == 'capsolver':
+                                verify_topken = SolveCaptchaCapsolver("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
                             if captcha_token != None:
                                 break
                         except:
