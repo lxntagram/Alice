@@ -1,18 +1,18 @@
 {
     "captcha": {
-        "service": "",
-        "api_key": ""
+        "service": "capmonster", # capmonster, capsolver
+        "api_key": "your_api_key_here"
     },
 
     "email_verification": {
         "captcha": {
             "solve_captcha": true,
-            "service": "",
-            "api_key": ""
+            "service":  "capmonster", # capmonster, capsolver
+            "api_key": "your_api_key_here"
         },
 
         "mail_type": "OUTLOOK",
-        "kopechka_key": ""
+        "kopechka_key": "your_api_key_here"
     },
 
     "user":{
@@ -23,7 +23,7 @@
             "pronouns": true
         },
 	"invite":"TahUwFFV",
-    "unique_username": true
+	"unique_username": true
     },
 
 
