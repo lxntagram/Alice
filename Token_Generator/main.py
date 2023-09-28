@@ -576,7 +576,7 @@ class Generator:
                     f.write(f"{token}\n")
     def ev():
         password = "Al1ceTokens" # TEMP
-
+ 
 
         try:
             kopechka_request = requests.get(url=f"https://api.kopeechka.store/mailbox-get-email?site=discord.com&mail_type={config['email_verification']['mail_type']}&sender=&regex=&token={config['email_verification']['kopechka_key']}&soft=&investor=&type=JSON&subject=&clear=&api=2.0")
