@@ -12,7 +12,7 @@
         },
 
         "mail_type": "OUTLOOK",
-        "kopechka_key": "882e0e50a6f96e3c672711e760e6b145"
+        "kopechka_key": ""
     },
 
     "user":{
@@ -23,7 +23,7 @@
             "pronouns": true
         },
 	"invite":"TahUwFFV",
-        "unique_username": true
+    "unique_username": true
     },
 
 

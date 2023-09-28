@@ -349,7 +349,7 @@ def SolveCaptchaCapmonster(sitekey, url, ua, proxy):
         taskId = requests.post(
             f"https://api.capmonster.cloud/createTask",
             json={
-                "clientKey": "922c26d45eefe7c82a807f82067988fe",
+                "clientKey": config['captcha']['api_key'],
                 "task": {
                     "type": "HCaptchaTask",
                     "websiteURL": url,
@@ -591,8 +591,10 @@ class Generator:
         proxy = Misc.proxy()
         while True:
             try:
-
-                captcha_token = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+                if(config['captcha']['service'] == "capmonster"):
+                    captcha_token = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+                elif config['captcha']['service'] == 'capsolver':
+                    captcha_token = SolveCaptchaCapsolver("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
                 if captcha_token != None:
                     break
             except:
