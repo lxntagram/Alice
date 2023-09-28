@@ -12,17 +12,17 @@
         },
 
         "mail_type": "OUTLOOK",
-        "kopechka_key": ""
+        "kopechka_key": "882e0e50a6f96e3c672711e760e6b145"
     },
 
     "user":{
         "humanization": {
-            "pfp": true,
+            "pfp": false,
             "bio": true,
             "hypesquad": true,
             "pronouns": true
         },
-
+	"invite":"TahUwFFV",
         "unique_username": true
     },
 
